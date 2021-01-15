@@ -1,0 +1,46 @@
+version: "3"
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  node_js:
+    build: .
+    # image: "node-js-1"
+    # build: .
+    container_name: "node-js-2"
+    restart: on-failure
+    env_file: .env
+    environment:
+      - MONGO_USERNAME=$MONGO_USERNAME
+      - MONGO_PASSWORD=$MONGO_PASSWORD
+      - MONGO_HOSTNAME=db
+      - MONGO_PORT=$MONGO_PORT
+      - MONGO_DB=$MONGO_DB
+    ports:
+      - "80:8080"
+    volumes:
+      - /nodejs-mongo-mongoose/:/usr/src/app
+      - /nodejs-mongo-mongoose/node_modules:/usr/src/app/node_modules
+    networks:
+      - app-network
+    depends_on:
+      - db
+    command: ./wait-for.sh db:27017 -- /usr/src/app/node_modules/.bin/nodemon app.js
+
+  db:
+    image: "mongo"
+    container_name: "db-node"
+    restart: on-failure
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+    volumes:
+      - "/xxx87/dockerVol/dbdata:/data/db"
+    networks:
+      - app-network
+volumes:
+  dbdata:
+  nodejs-mongo-mongoose:

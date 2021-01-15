@@ -1,16 +1,18 @@
 FROM node:10-alpine
 
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+#RUN mkdir -p /usr/src/app/node_modules && chown -R node:node /usr/src/app
 
-WORKDIR /home/node/app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-USER node
+# USER node
 
 RUN npm install
 
-COPY --chown=node:node . .
+COPY . .
+
+# RUN chmod +x /usr/src/app/wait-for.sh
 
 EXPOSE 8080
 
